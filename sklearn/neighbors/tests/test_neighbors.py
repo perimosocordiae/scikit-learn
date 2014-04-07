@@ -14,6 +14,7 @@ from sklearn.utils.testing import assert_warns
 from sklearn.utils.testing import ignore_warnings
 from sklearn.utils.validation import check_random_state
 from sklearn import neighbors, datasets
+from sklearn.metrics import pairwise_distances
 
 rng = np.random.RandomState(0)
 # load and shuffle iris dataset
@@ -848,6 +849,18 @@ def test_callable_metric():
     dist2, ind2 = nbrs2.kneighbors(X)
 
     assert_array_almost_equal(dist1, dist2)
+
+
+def test_precomputed_metric(n_samples=20, n_features=3, n_neighbors=5):
+    """Test computing the neighbors from a precomputed distance matrix."""
+    X = rng.rand(n_samples, n_features)
+    metric = 'euclidean'
+    dist = pairwise_distances(X, metric=metric)
+    l2_knn = neighbors.NearestNeighbors(n_neighbors, algorithm='brute', metric=metric)
+    precomp_knn = neighbors.NearestNeighbors(n_neighbors, algorithm='brute', metric='precomputed')
+    expected = l2_knn.fit(X).kneighbors(X, return_distance=True)
+    actual = precomp_knn.fit(dist).kneighbors(dist, return_distance=True)
+    assert_array_almost_equal(actual, expected)
 
 
 if __name__ == '__main__':
