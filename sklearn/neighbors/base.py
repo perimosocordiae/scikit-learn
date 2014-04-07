@@ -31,7 +31,8 @@ VALID_METRICS = dict(ball_tree=BallTree.valid_metrics,
                             ['braycurtis', 'canberra', 'chebyshev',
                              'correlation', 'cosine', 'dice', 'hamming',
                              'jaccard', 'kulsinski', 'mahalanobis',
-                             'matching', 'minkowski', 'rogerstanimoto',
+                             'matching', 'minkowski',
+                             'precomputed', 'rogerstanimoto',
                              'russellrao', 'seuclidean', 'sokalmichener',
                              'sokalsneath', 'sqeuclidean',
                              'yule', 'wminkowski']))
@@ -288,8 +289,10 @@ class KNeighborsMixin(object):
             n_neighbors = self.n_neighbors
 
         if self._fit_method == 'brute':
-            # for efficiency, use squared euclidean distances
-            if self.effective_metric_ == 'euclidean':
+            if self.effective_metric_ == 'precomputed':
+                dist = X
+            elif self.effective_metric_ == 'euclidean':
+                # for efficiency, use squared euclidean distances
                 dist = pairwise_distances(X, self._fit_X, 'euclidean',
                                           squared=True)
             else:
@@ -450,8 +453,10 @@ class RadiusNeighborsMixin(object):
             radius = self.radius
 
         if self._fit_method == 'brute':
-            # for efficiency, use squared euclidean distances
-            if self.effective_metric_ == 'euclidean':
+            if self.effective_metric_ == 'precomputed':
+                dist = X
+            elif self.effective_metric_ == 'euclidean':
+                # for efficiency, use squared euclidean distances
                 dist = pairwise_distances(X, self._fit_X, 'euclidean',
                                           squared=True)
                 radius *= radius
