@@ -856,8 +856,10 @@ def test_precomputed_metric(n_samples=20, n_features=3, n_neighbors=5):
     X = rng.rand(n_samples, n_features)
     metric = 'euclidean'
     dist = pairwise_distances(X, metric=metric)
-    l2_knn = neighbors.NearestNeighbors(n_neighbors, algorithm='brute', metric=metric)
-    precomp_knn = neighbors.NearestNeighbors(n_neighbors, algorithm='brute', metric='precomputed')
+    l2_knn = neighbors.NearestNeighbors(
+        n_neighbors, algorithm='brute', metric=metric)
+    precomp_knn = neighbors.NearestNeighbors(
+        n_neighbors, algorithm='brute', metric='precomputed')
     expected = l2_knn.fit(X).kneighbors(X, return_distance=True)
     actual = precomp_knn.fit(dist).kneighbors(dist, return_distance=True)
     assert_array_almost_equal(actual, expected)
